@@ -24,7 +24,7 @@ namespace ParseServerConsole
                 Server="http://localhost:1337/parse/"
             });
 
-            Console.WriteLine("Generate data to save on parse-server");
+            Console.WriteLine("Generate data to save on parse-server using subclassing");
 
             World earth = new World
             {
@@ -58,12 +58,21 @@ namespace ParseServerConsole
                 Neighbors = neighbors
             };
 
-            Console.WriteLine("Save data to parse-server");
-
+            Console.WriteLine("Save subclass data to parse-server");
             Task continuationTask = hello.SaveAsync().ContinueWith((antecedent) => {
                 Console.WriteLine("Save Finished! Status:{0}", antecedent.Status.ToString());
             });
             continuationTask.Wait();
+
+            Console.WriteLine("Generate data to save on parse-server using ParseObject.Create");
+            var testObject = ParseObject.Create("World"); // Since World is subclassed use .Create()
+            testObject["name"] = "Venus";
+            testObject["message"] = "Hello from Venus!";
+            Console.WriteLine("Save object data to parse-server");
+            Task contTask = testObject.SaveAsync().ContinueWith((antecedent) => {
+                Console.WriteLine("Save TestObject Finished! Status:{0}", antecedent.Status.ToString());
+            });
+            contTask.Wait();
 
             Console.ReadLine();
         }
