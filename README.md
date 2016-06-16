@@ -5,3 +5,5 @@ Basic console example app using the Parse .NET SDK with parse-server
 
 * Hello
 * World
+
+Currently uses Parse .NET SDK v1.7.0 
