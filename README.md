@@ -6,4 +6,7 @@ Basic console example app using the Parse .NET SDK with parse-server
 * Hello
 * World
 
-Currently uses Parse .NET SDK v1.7.0 
+#### Worth Mentioning
+* Uses Parse .NET SDK v1.7.0 
+* Tested with parse-server v2.2.13
+* This application generates a very small (10x10 pixel) image and saves it to parse-server as part of the generated data.
