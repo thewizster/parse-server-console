@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Parse;
+using System.Drawing;
 
 namespace ParseServerConsole
 {
@@ -24,28 +25,52 @@ namespace ParseServerConsole
                 Server="http://localhost:1337/parse/"
             });
 
+            Console.WriteLine("Generate an image to save on parse-server.");
+            Bitmap flag = new Bitmap(10, 10);
+            for (int x = 0; x < flag.Height; x++)
+                for (int y = 0; y < flag.Width; y++)
+                    flag.SetPixel(x, y, Color.White);
+
+            for (int x = 0; x < flag.Height; x++)
+                flag.SetPixel(x,x, Color.Red);
+
+            // Convert the new bitmap image to byte array for ParseFile
+            ImageConverter converter = new ImageConverter();
+            byte[] bytes = (byte[])converter.ConvertTo(flag, typeof(byte[]));
+            Parse.ParseFile flagImage = new ParseFile("flag.bmp", bytes);
+
+            Console.WriteLine("Saving the image to parse-server.");
+            Task fileContinuationTask = flagImage.SaveAsync().ContinueWith((antecedent) => {
+                Console.WriteLine("Finished saving file to parse-server");
+            });
+            fileContinuationTask.Wait();
+
             Console.WriteLine("Generate data to save on parse-server using subclassing");
 
             World earth = new World
             {
                 Name = "Earth",
-                Message = "Hello from Earth!"
+                Message = "Hello from Earth!",
+                Flag = flagImage
             };
 
             World mars = new World
             {
                 Name = "Mars",
-                Message = "Hello from Mars!"
+                Message = "Hello from Mars!",
+                Flag = flagImage
             };
             World saturn = new World
             {
                 Name = "Saturn",
-                Message = "Hello from Saturn!"
+                Message = "Hello from Saturn!",
+                Flag = flagImage
             };
             World jupiter = new World
             {
                 Name = "Jupiter",
-                Message = "Hello from Jupiter!"
+                Message = "Hello from Jupiter!",
+                Flag = flagImage
             };
 
             List<World> neighbors = new List<World>();
@@ -68,6 +93,7 @@ namespace ParseServerConsole
             var testObject = ParseObject.Create("World"); // Since World is subclassed use .Create()
             testObject["name"] = "Venus";
             testObject["message"] = "Hello from Venus!";
+            testObject["flag"] = flagImage;
             Console.WriteLine("Save object data to parse-server");
             Task contTask = testObject.SaveAsync().ContinueWith((antecedent) => {
                 Console.WriteLine("Save TestObject Finished! Status:{0}", antecedent.Status.ToString());
@@ -108,6 +134,11 @@ namespace ParseServerConsole
         public string Message
         {
             get { return GetProperty<string>(); }
+            set { SetProperty(value); }
+        }
+        [ParseFieldName("flag")]
+        public ParseFile Flag {
+            get { return GetProperty<ParseFile>(); }
             set { SetProperty(value); }
         }
     }
